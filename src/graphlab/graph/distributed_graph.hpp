@@ -685,8 +685,8 @@ namespace graphlab {
       size_t threshold = 100;
       // ginger heuristic
       size_t interval = std::numeric_limits<size_t>::max();
-      size_t nedges = 0;
-      size_t nverts = 0;
+        std::string nedges;
+        std::string nverts;
       // bipartite
       std::string favorite = "source"; /* source or target */
 
@@ -3286,7 +3286,7 @@ namespace graphlab {
     void set_ingress_method(const std::string& method,
         size_t bufsize = 50000, bool usehash = false, bool userecent = false, 
         std::string favorite = "source",
-        size_t threshold = 100, size_t nedges = 0, size_t nverts = 0,
+        size_t threshold = 100, std::string nedges = "0", std::string nverts = "0",
         size_t interval = std::numeric_limits<size_t>::max()) {
       if(ingress_ptr != NULL) { delete ingress_ptr; ingress_ptr = NULL; }
       if (method == "oblivious") {
@@ -3319,8 +3319,13 @@ namespace graphlab {
         set_cuts_type(HYBRID_CUTS);
       } else if (method == "hybrid_ginger") {
         if (rpc.procid() == 0) logstream(LOG_EMPH) << "Use hybrid ginger ingress" << std::endl;
-        ASSERT_GT(nedges, 0); ASSERT_GT(nverts, 0);
-        ingress_ptr = new distributed_hybrid_ginger_ingress<VertexData, EdgeData>(rpc.dc(), *this, threshold, nedges, nverts, interval);
+          std::stringstream nedgesstr(nedges);
+          int64_t nedges_64;
+          nedgesstr >> nedges_64;
+          std::stringstream nvertsstr(nverts);
+          int64_t nverts_64;
+          nvertsstr >> nverts_64;
+        ingress_ptr = new distributed_hybrid_ginger_ingress<VertexData, EdgeData>(rpc.dc(), *this, threshold, nedges_64, nverts_64, interval);
         set_cuts_type(HYBRID_GINGER_CUTS);
       } else {
         // use default ingress method if none is specified

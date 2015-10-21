@@ -136,8 +136,8 @@ namespace graphlab {
     /// heuristic model from fennel
     /// records about the number of edges and vertices in the graph
     /// given from the commandline
-    size_t tot_nedges;
-    size_t tot_nverts;
+    int64_t tot_nedges;
+    int64_t tot_nverts;
     /// threshold for incremental mht to be synced across the cluster
     /// when the incremental mht size reaches the preset interval,
     /// we will perform a synchronization on mht across the cluster
@@ -149,7 +149,7 @@ namespace graphlab {
 
   public:
     distributed_hybrid_ginger_ingress(distributed_control& dc, graph_type& graph, 
-        size_t threshold = 100, size_t tot_nedges = 0, size_t tot_nverts = 0, 
+        size_t threshold = 100, int64_t tot_nedges = 0, int64_t tot_nverts = 0,
         size_t interval = std::numeric_limits<size_t>::max()) :
         base_type(dc, graph), hybrid_rpc(dc, this), 
         graph(graph), threshold(threshold), 
