@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <iostream>
 
 #include <graphlab.hpp>
 // #include <graphlab/macros_def.hpp>
@@ -289,6 +290,22 @@ int main(int argc, char** argv) {
 
   // Tear-down communication layer and quit -----------------------------------
   graphlab::mpi_tools::finalize();
+
+    const std::string output_filename = "/home/yosub_shin_0/output.csv";
+    std::ofstream ofs;
+    ofs.open(output_filename.c_str(), std::ios::out | std::ios::app);
+    if (!ofs.is_open()) {
+        std::cout << "Failed to open output file.\n";
+        return EXIT_FAILURE;
+    }
+    std::string ingress_method = "";
+    clopts.get_graph_args().get_option("ingress", ingress_method);
+
+    // algorithm,partitioning_strategy,num_iterations,loading_time,partitioning_time,computation_time,total_time
+    ofs << "pagerank," << ingress_method << "," << ITERATIONS << "," << loading << "," << finalizing << "," << runtime << "," << (loading + finalizing + runtime) << std::endl;
+
+    ofs.close();
+
   return EXIT_SUCCESS;
 } // End of main
 
