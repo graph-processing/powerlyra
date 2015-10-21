@@ -225,7 +225,7 @@ int main(int argc, char** argv) {
 
   // Build the graph ----------------------------------------------------------
   dc.cout() << "Loading graph." << std::endl;
-  graphlab::timer timer; 
+  graphlab::timer timer;
   graph_type graph(dc, clopts);
   if(powerlaw > 0) { // make a synthetic graph
     dc.cout() << "Loading synthetic Powerlaw graph." << std::endl;
@@ -241,7 +241,7 @@ int main(int argc, char** argv) {
     return 0;
   }
   const double loading = timer.current_time();
-  dc.cout() << "Loading graph. Finished in " 
+  dc.cout() << "Loading graph. Finished in "
             << loading << std::endl;
 
 
@@ -250,7 +250,7 @@ int main(int argc, char** argv) {
   timer.start();
   graph.finalize();
   const double finalizing = timer.current_time();
-  dc.cout() << "Finalizing graph. Finished in " 
+  dc.cout() << "Finalizing graph. Finished in "
             << finalizing << std::endl;
 
   // NOTE: ingress time = loading time + finalizing time
@@ -271,14 +271,17 @@ int main(int argc, char** argv) {
   const double runtime = timer.current_time();
   dc.cout() << "----------------------------------------------------------"
             << std::endl
-            << "Final Runtime (seconds):   " << runtime 
+            << "Final Runtime (seconds):   " << runtime
             << std::endl
             << "Updates executed: " << engine.num_updates() << std::endl
-            << "Update Rate (updates/second): " 
+            << "Update Rate (updates/second): "
             << engine.num_updates() / runtime << std::endl;
 
   const double total_rank = graph.map_reduce_vertices<double>(map_rank);
   std::cout << "Total rank: " << total_rank << std::endl;
+
+  const double replication_factor = (double)graph.num_replicas()/graph.num_vertices();
+  std::cout << "Replication factor: " << replication_factor << std::endl;
 
   // Save the final graph -----------------------------------------------------
   if (saveprefix != "") {
@@ -301,8 +304,8 @@ int main(int argc, char** argv) {
     std::string ingress_method = "";
     clopts.get_graph_args().get_option("ingress", ingress_method);
 
-    // algorithm,partitioning_strategy,num_iterations,loading_time,partitioning_time,computation_time,total_time
-    ofs << "pagerank," << ingress_method << "," << ITERATIONS << "," << loading << "," << finalizing << "," << runtime << "," << (loading + finalizing + runtime) << std::endl;
+    // algorithm,partitioning_strategy,num_iterations,replication_factor,loading_time,partitioning_time,computation_time,total_time
+    ofs << "pagerank," << ingress_method << "," << ITERATIONS << "," << replication_factor << "," << loading << "," << finalizing << "," << runtime << "," << (loading + finalizing + runtime) << std::endl;
 
     ofs.close();
 
